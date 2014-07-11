@@ -1,9 +1,9 @@
 local LrTasks = import 'LrTasks'
 local LrDialogs = import 'LrDialogs'
 local lrApplication = import 'LrApplication'
-local LrShell = import 'LrShell'
 local LrExportSession = import 'LrExportSession'
-
+local LrPathUtils = import 'LrPathUtils'
+local LrFileUtils = import 'LrFileUtils'
 
 local function getSelection ()
 	 local catalog = lrApplication.activeCatalog()
@@ -14,8 +14,32 @@ local function getSelection ()
           end
      end
 
+local function getAppTmpPath()
+  local appTmp = 'mintaka'
+  local globalTmpPath = LrPathUtils.getStandardFilePath('temp')
+  appTmpPath =  LrPathUtils.child(globalTmpPath, appTmp)
+  return appTmpPath
+end  
+
+function endswith(String,End)
+   return End=='' or string.sub(String,-string.len(End))==End
+end
+
+local function prepareTmpFolder()
+  appTmpPath =  getAppTmpPath()
+  local exists = LrFileUtils.exists(appTmpPath)
+  if exists then
+     for filePath in LrFileUtils.directoryEntries(appTmpPath) do
+         if endswith(filePath,'.jpg') then
+             LrFileUtils.delete(filePath)           
+         end 
+     end 
+  end  
+  LrFileUtils.createDirectory(appTmpPath) 
+end
+
 local function performExport()
-	
+  prepareTmpFolder() 
 	LrTasks.startAsyncTask(function()
 	  local catalog = lrApplication.activeCatalog()
 	  local photos = getSelection()
@@ -34,7 +58,7 @@ local function performExport()
                         LR_size_resolutionUnits = "inch",
                         LR_outputSharpeningOn = false,
                         LR_export_destinationType = "specificFolder",
-                        LR_export_destinationPathPrefix = 'c:/dev/images/',
+                        LR_export_destinationPathPrefix = getAppTmpPath(),
                         LR_collisionHandling = "skip",
 						LR_extensionCase = "lowercase",
 						LR_jpeg_useLimitSize = false,  
