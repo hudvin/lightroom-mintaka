@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    keywordsloader.cpp
+    keywordsloader.cpp \
+    dbwrapper.cpp
 
 HEADERS  += mainwindow.h \
-    keywordsloader.h
+    keywordsloader.h \
+    dbwrapper.h
 
 FORMS    += mainwindow.ui
 

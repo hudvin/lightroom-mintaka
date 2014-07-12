@@ -28,13 +28,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    QStringList nameFilter("*.jpg");
-    QDir directory(tmpFolderName);
-    QStringList txtFilesAndDirectories = directory.entryList(nameFilter);
-   // cout<<txtFilesAndDirectories<<endl;
-
-
-
 
     QApplication a(argc, argv);
     MainWindow w;

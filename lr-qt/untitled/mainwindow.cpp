@@ -19,6 +19,7 @@
 #include <QTableWidgetItem>
 
 #include <keywordsloader.h>
+#include <dbwrapper.h>
 
 #include <QDebug>
 
@@ -36,13 +37,16 @@ void addRowToModel(QStandardItemModel* model,QString firstColumn, QString second
 QStandardItemModel* createModel(QObject* parent){
 
 
-    KeywordsLoader keywordsLoader;
-    QList<QString> keywords = keywordsLoader.load();
-    foreach( QString keyword, keywords ){
-        qDebug()<<keyword;
-    }
+//    KeywordsLoader keywordsLoader;
+//    QList<QString> keywords = keywordsLoader.load();
+//    foreach( QString keyword, keywords ){
+//        qDebug()<<keyword;
+//    }
 
-    const int numRows = keywords.size();
+    DBWrapper dbWrapper;
+    QList<Tag> tags = dbWrapper.getVisibleTags();
+
+    const int numRows =  tags.size(); //keywords.size();
     const int numColumns = 2;
 
     QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
@@ -51,8 +55,9 @@ QStandardItemModel* createModel(QObject* parent){
 
     //special row
     addRowToModel(model, "[no keywords]", "0",0);
+
     for (int row = 1; row < numRows+1; ++row){
-        addRowToModel(model, keywords.at(row-1),"0", row);
+        addRowToModel(model, tags.at(row-1).tag,"0", row);
     }
     return model;
 }
@@ -64,15 +69,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QString tmpFolderName("mintaka");
-    QString ss = QStandardPaths::locate(QStandardPaths::TempLocation, tmpFolderName, QStandardPaths::LocateDirectory);
-
-    QDirIterator dirIt(ss,QDirIterator::Subdirectories);
     ui->lrImages->setIconSize(QSize(250,250));
 
     QTableView* keywordsTable = ui->keywordsTable;
     keywordsTable->setModel(createModel(keywordsTable));
 
+
+    QString tmpFolderName("mintaka");
+    QString ss = QStandardPaths::locate(QStandardPaths::TempLocation, tmpFolderName, QStandardPaths::LocateDirectory);
+    QDirIterator dirIt(ss,QDirIterator::Subdirectories);
 
     while (dirIt.hasNext()) {
         dirIt.next();
@@ -83,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     }
+
 
 
 
