@@ -25,6 +25,8 @@ function endswith(String,End)
    return End=='' or string.sub(String,-string.len(End))==End
 end
 
+
+
 local function prepareTmpFolder()
   appTmpPath =  getAppTmpPath()
   local exists = LrFileUtils.exists(appTmpPath)
@@ -78,10 +80,23 @@ local function performExport()
       
 	    ex:doExportOnCurrentTask()
 
+      local csv_items = {}
       for i, rendition in ex:renditions() do
         local status, other = rendition:waitForRender()
+        local uuid = rendition.photo:getRawMetadata( 'uuid')
+        local filename = LrPathUtils.leafName(other)
+        csv_items[uuid] = filename
       end
-	  
+	    
+      local listPath = LrPathUtils.child(getAppTmpPath(), "list.txt")
+      LrDialogs.message(listPath)
+      local f = io.open(listPath , "w" )
+      
+      for k, v in pairs(csv_items) do
+         local line = k .."," .. v .. '\n'
+         f:write(line)
+      end
+      io.close(f)
 	   
 	end
 	)
