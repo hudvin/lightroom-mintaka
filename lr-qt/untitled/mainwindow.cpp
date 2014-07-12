@@ -9,6 +9,8 @@
 #include <QStringList>
 #include <QSize>
 #include <QListView>
+#include <QList>
+#include <QString>
 
 #include <QStandardItem>
 #include <QStandardItemModel>
@@ -16,26 +18,42 @@
 #include <QTableView>
 #include <QTableWidgetItem>
 
-QStandardItemModel* createModel(QObject* parent)
-{
-    const int numRows = 10;
-    const int numColumns = 10;
+#include <keywordsloader.h>
+
+#include <QDebug>
+
+
+
+void addRowToModel(QStandardItemModel* model,QString firstColumn, QString secondColumn, int rowIdx){
+
+    QStandardItem* keywordItem = new QStandardItem(firstColumn);
+    model->setItem(rowIdx, 0, keywordItem);
+    //number of photos column
+    QStandardItem* counterItem = new QStandardItem(secondColumn);
+    model->setItem(rowIdx, 1, counterItem);
+}
+
+QStandardItemModel* createModel(QObject* parent){
+
+
+    KeywordsLoader keywordsLoader;
+    QList<QString> keywords = keywordsLoader.load();
+    foreach( QString keyword, keywords ){
+        qDebug()<<keyword;
+    }
+
+    const int numRows = keywords.size();
+    const int numColumns = 2;
 
     QStandardItemModel* model = new QStandardItemModel(numRows, numColumns);
     model->setHeaderData(0,Qt::Horizontal, "keyword");
-    model->setHeaderData(1,Qt::Horizontal, "number of photos");
+    model->setHeaderData(1,Qt::Horizontal, "number of \n photos");
 
-
-    for (int row = 0; row < numRows; ++row)
-    {
-        for (int column = 0; column < numColumns; ++column)
-        {
-            QString text = QString('A' + row) + QString::number(column + 1);
-            QStandardItem* item = new QStandardItem(text);
-            model->setItem(row, column, item);
-        }
-     }
-
+    //special row
+    addRowToModel(model, "[no keywords]", "0",0);
+    for (int row = 1; row < numRows+1; ++row){
+        addRowToModel(model, keywords.at(row-1),"0", row);
+    }
     return model;
 }
 
@@ -55,11 +73,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QTableView* keywordsTable = ui->keywordsTable;
     keywordsTable->setModel(createModel(keywordsTable));
 
-//    QTableWidgetItem *header1 = new QTableWidgetItem();
-//    header1->setText("Switch \"ON\" to Load");
-//    keywordsTable->setH
-//    tableWidget->setHorizontalHeaderItem(0,header1);
-
 
     while (dirIt.hasNext()) {
         dirIt.next();
@@ -67,11 +80,9 @@ MainWindow::MainWindow(QWidget *parent) :
             if (QFileInfo(dirIt.filePath()).suffix() == "jpg"){
                 QListWidgetItem *itm =
                         new QListWidgetItem(QIcon(dirIt.filePath()),"",ui->lrImages);
-
             }
         }
     }
-
 
 
 

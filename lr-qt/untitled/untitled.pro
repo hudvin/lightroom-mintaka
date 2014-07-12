@@ -13,8 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    keywordsloader.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    keywordsloader.h
 
 FORMS    += mainwindow.ui
+
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
