@@ -21,6 +21,8 @@ private slots:
 
     void on_saveBtn_clicked();
 
+    void on_keywordsTable_clicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 };

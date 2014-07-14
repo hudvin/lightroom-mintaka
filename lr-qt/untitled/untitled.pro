@@ -15,13 +15,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     keywordsloader.cpp \
-    dbwrapper.cpp \
-    handlers.cpp
+    dbwrapper.cpp
 
 HEADERS  += mainwindow.h \
     keywordsloader.h \
-    dbwrapper.h \
-    handlers.h
+    dbwrapper.h
 
 FORMS    += mainwindow.ui
 

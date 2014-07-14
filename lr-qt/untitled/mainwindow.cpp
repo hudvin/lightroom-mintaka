@@ -125,3 +125,16 @@ void MainWindow::on_saveBtn_clicked(){
         msgBox.exec();
 
 }
+
+void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
+    if (index.isValid()) {
+        QTableView* keywordsTable = ui->keywordsTable;
+        QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
+        QVariant value =  list.at(0).data(0);
+        if(value.isValid()){
+            QMessageBox m;
+            m.setText(value.toString());
+            m.exec();
+        }
+     }
+}
