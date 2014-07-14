@@ -89,7 +89,6 @@ local function performExport()
       end
 	    
       local listPath = LrPathUtils.child(getAppTmpPath(), "list.txt")
-      LrDialogs.message(listPath)
       local f = io.open(listPath , "w" )
       
       for k, v in pairs(csv_items) do
