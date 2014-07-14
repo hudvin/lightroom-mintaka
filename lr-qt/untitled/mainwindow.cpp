@@ -11,6 +11,8 @@
 #include <QListView>
 #include <QList>
 #include <QString>
+#include <QMessageBox>
+#include <QProgressDialog>
 
 #include <QStandardItem>
 #include <QStandardItemModel>
@@ -94,7 +96,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
+}
+
+void MainWindow::on_generateKeywordsBtn_clicked(){
+        QMessageBox msgBox;
+        msgBox.setText("Generate keywords");
+        msgBox.exec();
+
+        int numTasks = 100000;
+           QProgressDialog progress("Task in progress...", "Cancel", 0, numTasks, this);
+           progress.setWindowModality(Qt::WindowModal);
+
+           for (int i = 0; i < numTasks; i++) {
+               progress.setValue(i);
+
+               if (progress.wasCanceled())
+                   break;
+           }
+           progress.setValue(numTasks);
+
+}
+
+void MainWindow::on_saveBtn_clicked(){
+        QMessageBox msgBox;
+        msgBox.setText("Save keywords");
+        msgBox.exec();
+
 }
