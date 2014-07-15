@@ -37,14 +37,6 @@ void addRowToModel(QStandardItemModel* model,QString firstColumn, QString second
 }
 
 QStandardItemModel* createModel(QObject* parent){
-
-
-//    KeywordsLoader keywordsLoader;
-//    QList<QString> keywords = keywordsLoader.load();
-//    foreach( QString keyword, keywords ){
-//        qDebug()<<keyword;
-//    }
-
     DBWrapper dbWrapper;
     QList<Tag> tags = dbWrapper.getVisibleTags();
 
@@ -65,12 +57,8 @@ QStandardItemModel* createModel(QObject* parent){
 }
 
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
     ui->setupUi(this);
-
     ui->lrImages->setIconSize(QSize(250,250));
 
     QTableView* keywordsTable = ui->keywordsTable;
@@ -90,10 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     }
-
-
-
-
 }
 
 MainWindow::~MainWindow(){
@@ -101,29 +85,21 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::on_generateKeywordsBtn_clicked(){
-        QMessageBox msgBox;
-        msgBox.setText("Generate keywords");
-        msgBox.exec();
+    showMessageBox("Generate keywords");
+    int numTasks = 100000;
+    QProgressDialog progress("Task in progress...", "Cancel", 0, numTasks, this);
+    progress.setWindowModality(Qt::WindowModal);
 
-        int numTasks = 100000;
-           QProgressDialog progress("Task in progress...", "Cancel", 0, numTasks, this);
-           progress.setWindowModality(Qt::WindowModal);
-
-           for (int i = 0; i < numTasks; i++) {
-               progress.setValue(i);
-
-               if (progress.wasCanceled())
-                   break;
-           }
-           progress.setValue(numTasks);
-
+    for (int i = 0; i < numTasks; i++) {
+        progress.setValue(i);
+        if (progress.wasCanceled())
+          break;
+        }
+        progress.setValue(numTasks);
 }
 
 void MainWindow::on_saveBtn_clicked(){
-        QMessageBox msgBox;
-        msgBox.setText("Save keywords");
-        msgBox.exec();
-
+    showMessageBox("Save keywords");
 }
 
 void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
@@ -132,9 +108,14 @@ void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
         QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
         QVariant value =  list.at(0).data(0);
         if(value.isValid()){
-            QMessageBox m;
-            m.setText(value.toString());
-            m.exec();
+            showMessageBox(value.toString());
         }
      }
+}
+
+
+void MainWindow::showMessageBox(QString text){
+    QMessageBox m;
+    m.setText(text);
+    m.exec();
 }

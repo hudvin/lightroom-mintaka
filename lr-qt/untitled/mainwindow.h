@@ -25,6 +25,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    void MainWindow::showMessageBox(QString text);
 };
 
 #endif // MAINWINDOW_H

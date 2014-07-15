@@ -31,9 +31,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
-    w.show();
-
- //   w.showMaximized();
-
+    w.setWindowTitle(QString("Lighroom Plugin"));
+    w.showMaximized();
     return a.exec();
 }
