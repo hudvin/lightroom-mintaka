@@ -15,11 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     keywordsloader.cpp \
-    dbwrapper.cpp
+    dbwrapper.cpp \
+    sqlviewmodelsfactory.cpp \
+    dbconnector.cpp \
+    viewmodels.cpp
 
 HEADERS  += mainwindow.h \
     keywordsloader.h \
-    dbwrapper.h
+    dbwrapper.h \
+    sqlviewmodelsfactory.h \
+    dbconnector.h \
+    viewmodels.h
 
 FORMS    += mainwindow.ui
 

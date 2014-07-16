@@ -20,10 +20,16 @@
 #include <QTableView>
 #include <QTableWidgetItem>
 
+
+#include <sqlviewmodelsfactory.h>
+
+
 #include <keywordsloader.h>
 #include <dbwrapper.h>
 
 #include <QDebug>
+#include <dbconnector.cpp>
+#include <QSqlRelationalTableModel>
 
 
 
@@ -38,7 +44,13 @@ void addRowToModel(QStandardItemModel* model,QString firstColumn, QString second
 
 QStandardItemModel* createModel(QObject* parent){
     DBWrapper dbWrapper;
-    QList<Tag> tags = dbWrapper.getVisibleTags();
+
+    Singleton *one = Singleton::getInstance();
+    QList<Tag> tags =  one->getDBWrapper().getVisibleTags();
+
+
+
+    //QList<Tag> tags = dbWrapper.getVisibleTags();
 
     const int numRows =  tags.size(); //keywords.size();
     const int numColumns = 2;
@@ -58,11 +70,33 @@ QStandardItemModel* createModel(QObject* parent){
 
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
+
+
     ui->setupUi(this);
     ui->lrImages->setIconSize(QSize(250,250));
 
     QTableView* keywordsTable = ui->keywordsTable;
-    keywordsTable->setModel(createModel(keywordsTable));
+
+    Singleton *one = Singleton::getInstance();
+    SQLViewModelsFactory* f = new SQLViewModelsFactory();
+    QSqlQueryModel* tm = f->getTagsTableModel(&one->getDBWrapper().getDatabase());
+
+    //tm->removeColumn(0);
+    //tm->removeColumn(3);
+   // tm->setFilter("is_hidden==0");
+   // tm->setHeaderData(1, Qt::Horizontal,QObject::tr("keyword"));
+   // tm->setHeaderData(2, Qt::Horizontal,QObject::tr("number\n of photos"));
+
+
+
+    keywordsTable->setModel(tm);
+
+
+
+
+
+
+    //    keywordsTable->setModel(createModel(keywordsTable));
 
 
     QString tmpFolderName("mintaka");

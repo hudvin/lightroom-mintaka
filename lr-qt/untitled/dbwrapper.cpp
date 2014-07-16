@@ -22,10 +22,15 @@ DBWrapper::~DBWrapper(){
   qDebug()<<"before close database";
   qDebug()<<db.isOpen();
   if(db.isOpen()){
-      db.close();
+    //  db.close();
   }
   qDebug()<<"close database";
 }
+
+QSqlDatabase DBWrapper::getDatabase(){
+    return db;
+}
+
 
 QList<Tag> DBWrapper::getVisibleTags(){
    QSqlQuery query("SELECT id, tag FROM tags WHERE is_hidden=0", db);

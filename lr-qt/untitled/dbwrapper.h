@@ -23,6 +23,7 @@ public:
     DBWrapper();
     ~DBWrapper();
     QList<Tag> getVisibleTags();
+    QSqlDatabase getDatabase();
 
 private:
     QSqlDatabase db;
