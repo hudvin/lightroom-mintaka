@@ -23,6 +23,7 @@
 
 #include <sqlviewmodelsfactory.h>
 
+#include <csvreader.h>
 
 #include <keywordsloader.h>
 #include <dbwrapper.h>
@@ -31,6 +32,7 @@
 #include <dbconnector.cpp>
 #include <QSqlRelationalTableModel>
 
+#include <pathutils.h>
 
 
 void addRowToModel(QStandardItemModel* model,QString firstColumn, QString secondColumn, int rowIdx){
@@ -46,7 +48,7 @@ QStandardItemModel* createModel(QObject* parent){
     DBWrapper dbWrapper;
 
     Singleton *one = Singleton::getInstance();
-    QList<Tag> tags =  one->getDBWrapper().getVisibleTags();
+    QList<Keyword> tags =  one->getDBWrapper().getVisibleKeywords();
 
 
 
@@ -63,15 +65,13 @@ QStandardItemModel* createModel(QObject* parent){
     addRowToModel(model, "[no keywords]", "0",0);
 
     for (int row = 1; row < numRows+1; ++row){
-        addRowToModel(model, tags.at(row-1).tag,"0", row);
+        addRowToModel(model, tags.at(row-1).keyword,"0", row);
     }
     return model;
 }
 
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
-
-
     ui->setupUi(this);
     ui->lrImages->setIconSize(QSize(250,250));
 
@@ -79,39 +79,20 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
     Singleton *one = Singleton::getInstance();
     SQLViewModelsFactory* f = new SQLViewModelsFactory();
-    QSqlQueryModel* tm = f->getTagsTableModel(&one->getDBWrapper().getDatabase());
-
-    //tm->removeColumn(0);
-    //tm->removeColumn(3);
-   // tm->setFilter("is_hidden==0");
-   // tm->setHeaderData(1, Qt::Horizontal,QObject::tr("keyword"));
-   // tm->setHeaderData(2, Qt::Horizontal,QObject::tr("number\n of photos"));
-
-
+    DBWrapper dbWrapper = one->getDBWrapper();
+    QSqlQueryModel* tm = f->getTagsTableModel(&dbWrapper.getDatabase());
 
     keywordsTable->setModel(tm);
 
 
 
-
-
-
     //    keywordsTable->setModel(createModel(keywordsTable));
 
-
-    QString tmpFolderName("mintaka");
-    QString ss = QStandardPaths::locate(QStandardPaths::TempLocation, tmpFolderName, QStandardPaths::LocateDirectory);
-    QDirIterator dirIt(ss,QDirIterator::Subdirectories);
-
-    while (dirIt.hasNext()) {
-        dirIt.next();
-        if (QFileInfo(dirIt.filePath()).isFile()){
-            if (QFileInfo(dirIt.filePath()).suffix() == "jpg"){
-                QListWidgetItem *itm =
-                        new QListWidgetItem(QIcon(dirIt.filePath()),"",ui->lrImages);
-            }
-        }
+    foreach (PhotoEntry phonoEntry, dbWrapper.getPhotos()) {
+        QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
+        QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",ui->lrImages);
     }
+
 }
 
 MainWindow::~MainWindow(){
@@ -126,10 +107,11 @@ void MainWindow::on_generateKeywordsBtn_clicked(){
 
     for (int i = 0; i < numTasks; i++) {
         progress.setValue(i);
-        if (progress.wasCanceled())
+        if (progress.wasCanceled()){
           break;
         }
-        progress.setValue(numTasks);
+    }
+    progress.setValue(numTasks);
 }
 
 void MainWindow::on_saveBtn_clicked(){

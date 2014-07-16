@@ -5,16 +5,8 @@
 #include <QList>
 #include <QString>
 
-struct Tag{
-    Tag(int id, QString tag){
-        this->id = id;
-        this->tag = tag;
-    }
-
-    int id;
-    QString tag;
-
-};
+#include <csvreader.h>
+#include <structures.h>
 
 
 class DBWrapper
@@ -22,9 +14,12 @@ class DBWrapper
 public:
     DBWrapper();
     ~DBWrapper();
-    QList<Tag> getVisibleTags();
+    QList<Keyword> getVisibleKeywords();
+    void addPhotoEntry(PhotoEntry entry);
+    QList<PhotoEntry> getPhotos();
     QSqlDatabase getDatabase();
-
+    void deleteAllData();
+    void closeDatabase();
 private:
     QSqlDatabase db;
 

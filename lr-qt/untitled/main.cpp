@@ -7,29 +7,24 @@
 #include <QFileInfo>
 #include <QtDebug>
 #include <QStringList>
+#include <dbconnector.h>
+#include <csvreader.h>
 
 QTextStream cout(stdout, QIODevice::WriteOnly);
 
-
-int main(int argc, char *argv[])
-{
-    QString tmpFolderName("mintaka");
-    QString ss = QStandardPaths::locate(QStandardPaths::TempLocation, tmpFolderName, QStandardPaths::LocateDirectory);
-
-    cout<<ss<<endl;
-
-    QDirIterator dirIt(ss,QDirIterator::Subdirectories);
-    while (dirIt.hasNext()) {
-        dirIt.next();
-        if (QFileInfo(dirIt.filePath()).isFile()){
-            if (QFileInfo(dirIt.filePath()).suffix() == "jpg"){
-                qDebug()<<dirIt.filePath();
-            }
-        }
-    }
-
-
+int main(int argc, char *argv[]){
     QApplication a(argc, argv);
+    //remove all data from db
+    Singleton *dbHolder = Singleton::getInstance();
+    dbHolder->getDBWrapper().deleteAllData();
+    //load info about files from list.txt
+    CSVReader csvReader;
+    csvReader.load();
+    foreach (PhotoEntry entry, csvReader.getEntries()) {
+        dbHolder->getDBWrapper().addPhotoEntry(entry);
+        qDebug()<<entry.filename;
+    }
+    //init main window
     MainWindow w;
     w.setWindowTitle(QString("Lighroom Plugin"));
     w.showMaximized();

@@ -18,14 +18,17 @@ SOURCES += main.cpp\
     dbwrapper.cpp \
     sqlviewmodelsfactory.cpp \
     dbconnector.cpp \
-    viewmodels.cpp
+    csvreader.cpp \
+    pathutils.cpp
 
 HEADERS  += mainwindow.h \
     keywordsloader.h \
     dbwrapper.h \
     sqlviewmodelsfactory.h \
     dbconnector.h \
-    viewmodels.h
+    csvreader.h \
+    pathutils.h \
+    structures.h
 
 FORMS    += mainwindow.ui
 
