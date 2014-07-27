@@ -6,66 +6,13 @@
 #include <QMimeData>
 #include <QtGui>
 #include <QStyledItemDelegate>
+#include <dbconnector.h>
 
-class StyledItemDelegate : public QStyledItemDelegate
-{
-public:
-        StyledItemDelegate(QObject *parent = NULL) :
-          QStyledItemDelegate(parent) {}
-          void paint(QPainter *painter, const QStyleOptionViewItem &option,
-                  const QModelIndex &index) const{
-              QStyleOptionViewItemV4 opt = option;
-                  initStyleOption(&opt, index);
-              initStyleOption(&opt, index);
-              qDebug()<<"drop action "<< (option.state==QStyle::State_MouseOver);
-//              qDebug()<<"focus";
-//                  QStyleOptionViewItem opt = option;
-//                //  if(opt.state!=QStyle::State_Selected){
-//                 //     opt.state = QStyle::State_Selected;
-
-//               //   }
-              //    QStyledItemDelegate::paint(painter, option, index);
-
-
-              if((option.state & QStyle::State_MouseOver)){
-
-//                  QColor color(255,255,130,100);
-//                      QColor colorEnd(255,255,50,150);
-//                      QLinearGradient gradient(option.rect.topLeft(),option.rect.bottomRight());
-//                      gradient.setColorAt(0,color);
-//                      gradient.setColorAt(1,colorEnd);
-//                      QBrush brush(gradient);
-//                      painter->fillRect(option.rect,brush);
-
-          } else {
-                  QStyledItemDelegate::paint(painter, option, index);
-
-              }
-
-          }
-};
 
 DndTableView::DndTableView(QWidget *parent) : QTableView(parent){
-  this->setMouseTracking(true);
-//    setAcceptDrops(true);
-//    setDragEnabled(true);
-//    setDragDropMode(QAbstractItemView::DragDrop);
-//    viewport()->setAcceptDrops(true);
-//    setDropIndicatorShown(true);
-
-  //  setItemDelegate(new StyledItemDelegate(this));
-       setSelectionMode(QAbstractItemView::SingleSelection);
-       setSelectionBehavior(QAbstractItemView::SelectRows);
-
-
-//    setDropIndicatorShown(true);
-//    setDragDropOverwriteMode(true);
-//    viewport()->setAcceptDrops(true);
-
-//    setDragDropMode(QAbstractItemView::DragDrop);
-//    setDefaultDropAction(Qt::CopyAction);
-
-
+    this->setMouseTracking(true);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 
@@ -78,8 +25,22 @@ void DndTableView::dropEvent(QDropEvent *event){
     QModelIndex modelIndex = this->indexAt(event->pos());
     int row = modelIndex.row();
     QModelIndex firstModelIndex =  this->model()->index(row, 0);
-    QString keyword = firstModelIndex.data().toString();
-    qDebug()<<"position"<<keyword<<" : "<<event->mimeData()->text();
+    QString keywordValue = firstModelIndex.data().toString();
+    QString uuid = event->mimeData()->text();
+    qDebug()<<"position"<<keywordValue<<" : "<<event->mimeData()->text();
+
+    Singleton *one = Singleton::getInstance();
+    DBWrapper dbWrapper = one->getDBWrapper();
+    PhotoEntry photoEntry = dbWrapper.getPhotoByUUID(uuid);
+    Keyword keyword = dbWrapper.getKeywordByValue(keywordValue);
+    qDebug()<<keyword.id;
+    qDebug()<<photoEntry.id;
+    dbWrapper.addKeyword(photoEntry, keyword);
+
+    QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>
+                                       (this->model());
+    model->query().exec();
+    emit dataChanged(QModelIndex(), QModelIndex());
 }
 
 void DndTableView::dragMoveEvent(QDragMoveEvent * event){

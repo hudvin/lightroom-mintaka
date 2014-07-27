@@ -20,7 +20,7 @@ void CSVReader::load(){
         QTextStream in(&inputFile);
         while ( !in.atEnd() ){
             QStringList tokens = in.readLine().split(",");
-            PhotoEntry entry(tokens[0], tokens[1]);
+            PhotoEntry entry(-1,tokens[0], tokens[1]);
             entries<<entry;
             qDebug()<<tokens;
         }

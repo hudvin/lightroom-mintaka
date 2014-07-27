@@ -5,11 +5,13 @@
 
 
 struct PhotoEntry{
-    PhotoEntry(QString uuid, QString filename){
+    PhotoEntry(int id,QString uuid, QString filename){
+        this->id = id;
         this->filename = filename;
         this->uuid = uuid;
     }
 
+    int id;
     QString uuid, filename;
 };
 
