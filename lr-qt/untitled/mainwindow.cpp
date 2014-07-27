@@ -34,6 +34,8 @@
 
 #include <pathutils.h>
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
 
 void addRowToModel(QStandardItemModel* model,QString firstColumn, QString secondColumn, int rowIdx){
 
@@ -71,6 +73,7 @@ QStandardItemModel* createModel(QObject* parent){
 }
 
 
+
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
     ui->setupUi(this);
     ui->lrImages->setIconSize(QSize(250,250));
@@ -83,15 +86,16 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     QSqlQueryModel* tm = f->getTagsTableModel(&dbWrapper.getDatabase());
 
     keywordsTable->setModel(tm);
-
-
-
     //    keywordsTable->setModel(createModel(keywordsTable));
 
     foreach (PhotoEntry phonoEntry, dbWrapper.getPhotos()) {
         QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
         QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",ui->lrImages);
+        itm->setData(5, phonoEntry.uuid);
+
     }
+    ui->lrImages->setAcceptDrops(false);
+    ui->lrImages->setDragEnabled(true);
 
 }
 
@@ -135,3 +139,4 @@ void MainWindow::showMessageBox(QString text){
     m.setText(text);
     m.exec();
 }
+

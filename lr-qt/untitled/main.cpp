@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     csvReader.load();
     foreach (PhotoEntry entry, csvReader.getEntries()) {
         dbHolder->getDBWrapper().addPhotoEntry(entry);
-        qDebug()<<entry.filename;
+        qDebug()<<"add to db file: "<<entry.filename;
     }
     //init main window
     MainWindow w;

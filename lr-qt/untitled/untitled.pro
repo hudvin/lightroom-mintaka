@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     sqlviewmodelsfactory.cpp \
     dbconnector.cpp \
     csvreader.cpp \
-    pathutils.cpp
+    pathutils.cpp \
+    dndtableview.cpp \
+    imagelistwidget.cpp
 
 HEADERS  += mainwindow.h \
     keywordsloader.h \
@@ -28,7 +30,9 @@ HEADERS  += mainwindow.h \
     dbconnector.h \
     csvreader.h \
     pathutils.h \
-    structures.h
+    structures.h \
+    dndtableview.h \
+    imagelistwidget.h
 
 FORMS    += mainwindow.ui
 

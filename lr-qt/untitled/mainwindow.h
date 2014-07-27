@@ -18,10 +18,9 @@ public:
 private slots:
 
     void on_generateKeywordsBtn_clicked();
-
     void on_saveBtn_clicked();
-
     void on_keywordsTable_clicked(const QModelIndex &index);
+
 
 private:
     Ui::MainWindow *ui;
