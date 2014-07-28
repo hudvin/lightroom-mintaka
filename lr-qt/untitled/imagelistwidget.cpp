@@ -30,9 +30,5 @@ void ImageListWidget::mouseMoveEvent(QMouseEvent *event){
            Qt::DropAction dropAction = drag->start(Qt::CopyAction | Qt::MoveAction);
 
 
-
-    qDebug()<<"ddd";
-
-
 }
 

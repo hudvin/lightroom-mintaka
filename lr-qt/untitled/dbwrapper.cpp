@@ -38,18 +38,6 @@ QSqlDatabase DBWrapper::getDatabase(){
 }
 
 
-QList<Keyword> DBWrapper::getVisibleKeywords(){
-   QSqlQuery query("SELECT id, Keyword FROM Keywords WHERE is_hidden=0", db);
-   QList<Keyword> data;
-   while (query.next()) {
-           int id = query.value(0).toInt();
-           QString keyword = query.value(1).toString();
-           data<<Keyword(id, keyword);
-           qDebug() << keyword << id;
-   }
-   return data;
-}
-
 Keyword DBWrapper::getKeywordByValue(QString value){
     QSqlQuery query("SELECT id, tag FROM tags WHERE tag=? AND is_hidden=0", db);
     query.bindValue(0,value);
@@ -103,7 +91,8 @@ void DBWrapper::addPhotoEntry(PhotoEntry entry){
 
 
 QList<PhotoEntry> DBWrapper::getPhotos(){
-    QSqlQuery query("SELECT id,uuid, filename FROM photos", db);
+    QSqlQuery query("SELECT id,uuid, filename FROM photos " \
+                    "WHERE id NOT IN (SELECT photo_id FROM photos_tags)", db);
     QList<PhotoEntry> data;
     while (query.next()) {
         int id = query.value(0).toInt();
@@ -132,6 +121,27 @@ QList<Keyword> DBWrapper::getKeywordsForPhoto(PhotoEntry entry){
     return data;
 }
 
+
+QList<PhotoEntry> DBWrapper::getPhotosByKeyword(QString keywordValue){
+    qDebug()<<"kvalue "<<keywordValue;
+    QList<PhotoEntry> data;
+    QSqlQuery query("SELECT p.id, p.filename, p.uuid, t.tag FROM  tags t, photos p, photos_tags "\
+                    "WHERE t.tag  LIKE ? " \
+                    "AND t.id=photos_tags.tag_id AND p.id = photos_tags.photo_id;", db);
+    query.bindValue(0,keywordValue); //use id?
+    query.exec();
+    qDebug()<<query.size();
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString filename = query.value(1).toString();
+        QString uuid = query.value(2).toString();
+        PhotoEntry photoEntry(id, uuid,filename);
+        data<<photoEntry;
+     }
+    return data;
+}
+
+
 QSqlQueryModel* DBWrapper::getTagsTableModel(){
     QSqlQueryModel *model = new QSqlQueryModel;
     model->setQuery("SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
@@ -147,3 +157,5 @@ QSqlQueryModel* DBWrapper::getTagsTableModel(){
     model->setHeaderData(1,Qt::Horizontal, "number of \n photos");
     return model;
 }
+
+

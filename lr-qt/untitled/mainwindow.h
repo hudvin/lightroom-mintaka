@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QItemSelection>
 
 namespace Ui {
 class MainWindow;
@@ -15,11 +16,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+
 private slots:
 
     void on_generateKeywordsBtn_clicked();
     void on_saveBtn_clicked();
     void on_keywordsTable_clicked(const QModelIndex &index);
+
+protected slots:
+    void keywordSelected(const QString &currentKeyword);
+    void dataIsDropped();
 
 
 private:

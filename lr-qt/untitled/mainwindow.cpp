@@ -36,22 +36,54 @@
 #include <QDropEvent>
 
 
+void MainWindow::keywordSelected(const QString &currentKeyword){
+    Singleton *one = Singleton::getInstance();
+    DBWrapper dbWrapper = one->getDBWrapper();
+
+    ImageListWidget* lrImages = ui->lrImages;
+    lrImages->clear();
+
+    QList<PhotoEntry> photos;
+    if(currentKeyword=="[without tags]"){
+        photos = dbWrapper.getPhotos();
+    }else {
+        photos = dbWrapper.getPhotosByKeyword(currentKeyword);
+    }
+
+    lrImages->setIconSize(QSize(250,250));
+    foreach (PhotoEntry phonoEntry, photos) {
+        QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
+        QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",lrImages);
+        itm->setData(5, phonoEntry.uuid);
+
+    }
+
+    lrImages->setAcceptDrops(false);
+    lrImages->setDragEnabled(true);
+
+    qDebug()<<currentKeyword;
+}
+
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
     ui->setupUi(this);
-    ui->lrImages->setIconSize(QSize(250,250));
-    QTableView* keywordsTable = ui->keywordsTable;
+    DndTableView* keywordsTable = ui->keywordsTable;
 
     Singleton *one = Singleton::getInstance();
     DBWrapper dbWrapper = one->getDBWrapper();
     keywordsTable->setModel(dbWrapper.getTagsTableModel());
-    foreach (PhotoEntry phonoEntry, dbWrapper.getPhotos()) {
-        QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
-        QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",ui->lrImages);
-        itm->setData(5, phonoEntry.uuid);
+    keywordsTable->setCurrentIndex( keywordsTable->model()->index(0,0));
+    connect(keywordsTable, SIGNAL(keywordChanged(QString)),
+                          this, SLOT(keywordSelected(QString)));
 
-    }
-    ui->lrImages->setAcceptDrops(false);
-    ui->lrImages->setDragEnabled(true);
+    connect(keywordsTable, SIGNAL(dataIsDropped()),
+            this, SLOT(dataIsDropped()) );
+
+    keywordsTable->activate();
+}
+
+void MainWindow::dataIsDropped(){
+    keywordSelected(ui->keywordsTable->getCurrentKeyword());
+    qDebug()<<"changed";
 }
 
 MainWindow::~MainWindow(){
@@ -83,7 +115,7 @@ void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
         QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
         QVariant value =  list.at(0).data(0);
         if(value.isValid()){
-            showMessageBox(value.toString());
+          //  showMessageBox(value.toString());
         }
      }
 }

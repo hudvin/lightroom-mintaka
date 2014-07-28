@@ -14,12 +14,12 @@ class DBWrapper
 public:
     DBWrapper();
     ~DBWrapper();
-    QList<Keyword> getVisibleKeywords();
     void addPhotoEntry(PhotoEntry entry);
     Keyword getKeywordByValue(QString value);
     PhotoEntry getPhotoByUUID(QString uuid);
     void addKeyword(PhotoEntry photo, Keyword keyword);
     QList<PhotoEntry> getPhotos();
+    QList<PhotoEntry> getPhotosByKeyword(QString keywordValue="%");
     QSqlDatabase getDatabase();
     void deleteAllData();
     void closeDatabase();

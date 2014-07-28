@@ -11,6 +11,8 @@ class DndTableView : public QTableView
     Q_OBJECT
 public:
     explicit DndTableView(QWidget *parent = 0);
+    void activate();
+    QString getCurrentKeyword();
 
 protected:
 
@@ -18,14 +20,23 @@ protected:
     virtual void dropEvent(QDropEvent *event);
     virtual void dragMoveEvent(QDragMoveEvent * event);
 
-    Keyword getCurrentKeyword(QDropEvent *event);
+    void updateCurrentKeyword(QString keyword);
+    Keyword extractCurrentKeyword(QDropEvent *event);
 
     Singleton *one = Singleton::getInstance();
     DBWrapper dbWrapper = one->getDBWrapper();
+    QString currentKeyword;
+
 
 signals:
+    void keywordChanged(const QString &keyword);
+    void dataIsDropped();
 
-public slots:
+private slots:
+    void clickedSlot(QModelIndex index);
+
+
+
 
 };
 
