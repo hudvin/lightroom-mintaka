@@ -23,6 +23,8 @@ public:
     QSqlDatabase getDatabase();
     void deleteAllData();
     void closeDatabase();
+    QSqlQueryModel* getTagsTableModel();
+    QList<Keyword> getKeywordsForPhoto(PhotoEntry entry);
 private:
     QSqlDatabase db;
 

@@ -14,6 +14,8 @@ DBWrapper::DBWrapper(){
     path = QDir::toNativeSeparators(path);
     db.setDatabaseName(path);
     db.open();
+    QSqlQuery query("PRAGMA foreign_keys = ON;",db);
+    query.exec();
     qDebug()<<path<<db.lastError();
 
 }
@@ -99,6 +101,7 @@ void DBWrapper::addPhotoEntry(PhotoEntry entry){
 }
 
 
+
 QList<PhotoEntry> DBWrapper::getPhotos(){
     QSqlQuery query("SELECT id,uuid, filename FROM photos", db);
     QList<PhotoEntry> data;
@@ -109,4 +112,38 @@ QList<PhotoEntry> DBWrapper::getPhotos(){
             data<<PhotoEntry(id,uuid, filename);
     }
     return data;
+}
+
+
+QList<Keyword> DBWrapper::getKeywordsForPhoto(PhotoEntry entry){
+    QList<Keyword> data;
+    QSqlQuery query("SELECT tags.id, tags.tag from tags " \
+                    "INNER JOIN photos_tags on tags.id = photos_tags.tag_id "
+                    "INNER JOIN photos on photos.id = photos_tags.photo_id "
+                    "WHERE photos.uuid=?", db);
+    query.bindValue(0,entry.uuid);
+    query.exec();
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString tag = query.value(1).toString();
+        Keyword keyword(id, tag);
+        data<<keyword;
+     }
+    return data;
+}
+
+QSqlQueryModel* DBWrapper::getTagsTableModel(){
+    QSqlQueryModel *model = new QSqlQueryModel;
+    model->setQuery("SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
+                    "WHERE photos_tags.tag_id=tags.id ) as num " \
+                    "FROM tags WHERE is_hidden=0 " \
+                    "UNION " \
+                    " SELECT '[without tags]', " \
+                    "(SELECT COUNT(*) FROM photos " \
+                    "WHERE photos.id NOT IN(SELECT photos_tags.photo_id FROM photos_tags)) as num "
+                    );
+
+    model->setHeaderData(0,Qt::Horizontal, "keyword");
+    model->setHeaderData(1,Qt::Horizontal, "number of \n photos");
+    return model;
 }

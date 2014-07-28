@@ -22,6 +22,12 @@ struct Keyword{
     }
     int id;
     QString keyword;
+    bool operator==(const Keyword& other)const{
+        if(this->keyword==(other.keyword)){
+            return true;
+        }
+        return false;
+    }
 };
 
 

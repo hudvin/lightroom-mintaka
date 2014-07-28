@@ -16,7 +16,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     keywordsloader.cpp \
     dbwrapper.cpp \
-    sqlviewmodelsfactory.cpp \
     dbconnector.cpp \
     csvreader.cpp \
     pathutils.cpp \
@@ -26,7 +25,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     keywordsloader.h \
     dbwrapper.h \
-    sqlviewmodelsfactory.h \
     dbconnector.h \
     csvreader.h \
     pathutils.h \

@@ -3,6 +3,8 @@
 
 #include <QTableView>
 #include <QDragMoveEvent>
+#include <dbconnector.h>
+
 
 class DndTableView : public QTableView
 {
@@ -16,6 +18,10 @@ protected:
     virtual void dropEvent(QDropEvent *event);
     virtual void dragMoveEvent(QDragMoveEvent * event);
 
+    Keyword getCurrentKeyword(QDropEvent *event);
+
+    Singleton *one = Singleton::getInstance();
+    DBWrapper dbWrapper = one->getDBWrapper();
 
 signals:
 
