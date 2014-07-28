@@ -1,0 +1,2 @@
+set PATH=C:\dev\Qt5.3.1\5.3\msvc2013_64_opengl\bin\;%PATH%
+C:\dev\Qt5.3.1\5.3\msvc2013_64_opengl\bin\windeployqt.exe  C:\dev\projects\lr-plugin\lr-qt\build-untitled-Desktop_Qt_5_3_MSVC2013_OpenGL_64bit-Release\release\mintaka.exe

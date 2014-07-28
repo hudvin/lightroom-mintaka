@@ -40,9 +40,11 @@ local function prepareTmpFolder()
   LrFileUtils.createDirectory(appTmpPath) 
 end
 
-local function performExport()
+local function performExport() 
   prepareTmpFolder() 
 	LrTasks.startAsyncTask(function()
+	  --exitStatus = LrTasks.execute("notepad.exe")
+    --LrDialogs.message(exitStatus)
 	  local catalog = lrApplication.activeCatalog()
 	  local photos = getSelection()
 	  
