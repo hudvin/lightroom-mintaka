@@ -21,6 +21,14 @@ local function getAppTmpPath()
   return appTmpPath
 end  
 
+local function split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
 function endswith(String,End)
    return End=='' or string.sub(String,-string.len(End))==End
 end
@@ -104,60 +112,33 @@ local function performExport()
 end
 
 
-function split(s, delimiter)
-    result = {};
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        table.insert(result, match);
-    end
-    return result;
-end
+
 
 local function performImport()
-  local catalog = import "LrApplication".activeCatalog()
-import "LrTasks".startAsyncTask( function()
-
-
-
-
-
-
-
-
-   
---local photo = catalog:findPhotoByUuid('4E82077B-B2D7-4611-97D1-9CE8E048C813')
- -- if photo==nil then
-  --  LrDialogs.message("nil!!")
-
---end  
---LrDialogs.message(photo:getRawMetadata('path'))
-
- catalog:withWriteAccessDo('Change online album', function()
-            
-            local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
-local lines = io.open(listPath,"r") 
-for line in lines:lines() do 
-  local cols = split(line,",")
-  filename = cols[1]
-  uuid = cols [2]
-  local photo = catalog:findPhotoByUuid(uuid)
-  if photo == nill then
-      LrDialogs.message("nill!!!")
-  end  
-  for i = 3, #cols do
-    keywordTxt = cols[i]
-    keyword =  catalog:createKeyword(keywordTxt)
-    photo:addKeyword(keyword)
-    LrDialogs.message( keywordTxt ) -- This will give your needed output
-  end 
-end 
-lines:close()
-            
-            
-        end)
-end )
-
+  local catalog = lrApplication.activeCatalog()
+  LrTasks.startAsyncTask( function()
+      catalog:withWriteAccessDo('import keywords', function()
+          local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
+          local lines = io.open(listPath,"r") 
+          for line in lines:lines() do
+            local cols = split(line,",")
+            filename = cols[1]
+            uuid = cols [2]
+            local photo = catalog:findPhotoByUuid(uuid)
+            if not(photo == nil) then
+              for i = 3, #cols do
+                keywordTxt = cols[i]
+                keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
+                photo:addKeyword(keyword)
+              end
+            end 
+          end 
+          lines:close()  
+      end)
+   end )
 end
 
-performImport()
---performExport()
+
+--performImport()
+performExport()
 
