@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QItemSelection>
+#include <dbwrapper.h>
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +22,6 @@ private slots:
 
     void on_generateKeywordsBtn_clicked();
     void on_saveBtn_clicked();
-    void on_keywordsTable_clicked(const QModelIndex &index);
 
 protected slots:
     void keywordSelected(const QString &currentKeyword);
@@ -30,6 +30,7 @@ protected slots:
 
 private:
     Ui::MainWindow *ui;
+    DBWrapper *dbWrapper;
     void MainWindow::showMessageBox(QString text);
 };
 

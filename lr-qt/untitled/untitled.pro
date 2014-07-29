@@ -30,7 +30,8 @@ HEADERS  += mainwindow.h \
     pathutils.h \
     structures.h \
     dndtableview.h \
-    imagelistwidget.h
+    imagelistwidget.h \
+    constants.h
 
 FORMS    += mainwindow.ui
 

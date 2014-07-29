@@ -18,8 +18,9 @@ public:
     Keyword getKeywordByValue(QString value);
     PhotoEntry getPhotoByUUID(QString uuid);
     void addKeyword(PhotoEntry photo, Keyword keyword);
-    QList<PhotoEntry> getPhotos();
+    QList<PhotoEntry> getPhotosWithoutTags();
     QList<PhotoEntry> getPhotosByKeyword(QString keywordValue="%");
+    QList<PhotoEntry> DBWrapper::getAllPhotos();
     QSqlDatabase getDatabase();
     void deleteAllData();
     void closeDatabase();

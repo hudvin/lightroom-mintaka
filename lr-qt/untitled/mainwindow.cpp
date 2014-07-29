@@ -34,6 +34,9 @@
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <constants.h>
+#include <QFile>
+#include <QTextStream>
 
 
 void MainWindow::keywordSelected(const QString &currentKeyword){
@@ -45,7 +48,7 @@ void MainWindow::keywordSelected(const QString &currentKeyword){
 
     QList<PhotoEntry> photos;
     if(currentKeyword=="[without tags]"){
-        photos = dbWrapper.getPhotos();
+        photos = dbWrapper.getPhotosWithoutTags();
     }else {
         photos = dbWrapper.getPhotosByKeyword(currentKeyword);
     }
@@ -69,8 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     DndTableView* keywordsTable = ui->keywordsTable;
 
     Singleton *one = Singleton::getInstance();
-    DBWrapper dbWrapper = one->getDBWrapper();
-    keywordsTable->setModel(dbWrapper.getTagsTableModel());
+    this->dbWrapper = &one->getDBWrapper();
+    keywordsTable->setModel(dbWrapper->getTagsTableModel());
     keywordsTable->setCurrentIndex( keywordsTable->model()->index(0,0));
     connect(keywordsTable, SIGNAL(keywordChanged(QString)),
                           this, SLOT(keywordSelected(QString)));
@@ -106,19 +109,42 @@ void MainWindow::on_generateKeywordsBtn_clicked(){
 }
 
 void MainWindow::on_saveBtn_clicked(){
-    showMessageBox("Save keywords");
+    // format:   filename, uuid, tags
+    //save to AppData output.txt
+    QStringList csvData;
+    foreach (PhotoEntry photo, dbWrapper->getAllPhotos()) {
+        QStringList lineData;
+        QList<Keyword> keywords = dbWrapper->getKeywordsForPhoto(photo);
+        lineData+=photo.filename;
+        lineData+=photo.uuid;
+        foreach (Keyword keyword, keywords) {
+           lineData+=keyword.keyword;
+        }
+        csvData+=lineData.join(",");
+    }
+    QString appTmpDir = PathUtils::getAppTmpDir();
+    QString filePath =appTmpDir + "/" + Constants::OUTPUT_FILE;
+
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        foreach (const QString &str, csvData){
+            stream << str << endl;
+        }
+    }
+    showMessageBox("Saved");
 }
 
-void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
-    if (index.isValid()) {
-        QTableView* keywordsTable = ui->keywordsTable;
-        QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
-        QVariant value =  list.at(0).data(0);
-        if(value.isValid()){
-          //  showMessageBox(value.toString());
-        }
-     }
-}
+//void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
+//    if (index.isValid()) {
+//        QTableView* keywordsTable = ui->keywordsTable;
+//        QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
+//        QVariant value =  list.at(0).data(0);
+//        if(value.isValid()){
+//          //  showMessageBox(value.toString());
+//        }
+//     }
+//}
 
 
 void MainWindow::showMessageBox(QString text){

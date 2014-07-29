@@ -90,15 +90,29 @@ void DBWrapper::addPhotoEntry(PhotoEntry entry){
 
 
 
-QList<PhotoEntry> DBWrapper::getPhotos(){
+QList<PhotoEntry> DBWrapper::getPhotosWithoutTags(){
     QSqlQuery query("SELECT id,uuid, filename FROM photos " \
-                    "WHERE id NOT IN (SELECT photo_id FROM photos_tags)", db);
+                    "WHERE id NOT IN (SELECT photo_id FROM photos_tags)");
     QList<PhotoEntry> data;
     while (query.next()) {
         int id = query.value(0).toInt();
-            QString uuid = query.value(1).toString();
-            QString filename = query.value(2).toString();
-            data<<PhotoEntry(id,uuid, filename);
+        QString uuid = query.value(1).toString();
+        QString filename = query.value(2).toString();
+        data<<PhotoEntry(id,uuid, filename);
+
+    }
+    return data;
+}
+
+QList<PhotoEntry> DBWrapper::getAllPhotos(){
+    QSqlQuery query("SELECT id,uuid, filename FROM photos ");
+    QList<PhotoEntry> data;
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString uuid = query.value(1).toString();
+        QString filename = query.value(2).toString();
+        data<<PhotoEntry(id,uuid, filename);
+
     }
     return data;
 }
@@ -109,7 +123,7 @@ QList<Keyword> DBWrapper::getKeywordsForPhoto(PhotoEntry entry){
     QSqlQuery query("SELECT tags.id, tags.tag from tags " \
                     "INNER JOIN photos_tags on tags.id = photos_tags.tag_id "
                     "INNER JOIN photos on photos.id = photos_tags.photo_id "
-                    "WHERE photos.uuid=?", db);
+                    "WHERE photos.uuid=?");
     query.bindValue(0,entry.uuid);
     query.exec();
     while (query.next()) {
