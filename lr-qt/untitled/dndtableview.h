@@ -3,8 +3,7 @@
 
 #include <QTableView>
 #include <QDragMoveEvent>
-#include <dbconnector.h>
-
+#include <dbwrapper.h>
 
 class DndTableView : public QTableView
 {
@@ -23,8 +22,9 @@ protected:
     void updateCurrentKeyword(QString keyword);
     Keyword extractCurrentKeyword(QDropEvent *event);
 
-    Singleton *one = Singleton::getInstance();
-    DBWrapper dbWrapper = one->getDBWrapper();
+
+    //Singleton *one = Singleton::getInstance();
+    DBWrapper* dbWrapper = &DBWrapper::GetInstance();
     QString currentKeyword;
 
 

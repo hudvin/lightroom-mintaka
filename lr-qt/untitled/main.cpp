@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <QApplication>
 #include <QLabel>
 #include <QtCore>
 #include <QStandardPaths>
@@ -7,21 +6,21 @@
 #include <QFileInfo>
 #include <QtDebug>
 #include <QStringList>
-#include <dbconnector.h>
 #include <csvreader.h>
+#include <QApplication>
 
 QTextStream cout(stdout, QIODevice::WriteOnly);
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     //remove all data from db
-    Singleton *dbHolder = Singleton::getInstance();
-    dbHolder->getDBWrapper().deleteAllData();
+    DBWrapper *dbWrapper = &DBWrapper::GetInstance();
+    dbWrapper->deleteAllData();
     //load info about files from list.txt
     CSVReader csvReader;
     csvReader.load();
     foreach (PhotoEntry entry, csvReader.getEntries()) {
-        dbHolder->getDBWrapper().addPhotoEntry(entry);
+        dbWrapper->addPhotoEntry(entry);
         qDebug()<<"add to db file: "<<entry.filename;
     }
     //init main window

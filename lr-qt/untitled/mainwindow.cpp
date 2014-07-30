@@ -13,44 +13,36 @@
 #include <QString>
 #include <QMessageBox>
 #include <QProgressDialog>
-
 #include <QStandardItem>
 #include <QStandardItemModel>
-
 #include <QTableView>
 #include <QTableWidgetItem>
-
-
-#include <csvreader.h>
-
-#include <keywordsloader.h>
-#include <dbwrapper.h>
-
 #include <QDebug>
-#include <dbconnector.cpp>
 #include <QSqlRelationalTableModel>
-
-#include <pathutils.h>
-
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include <constants.h>
 #include <QFile>
 #include <QTextStream>
 
+#include <csvreader.h>
+#include <keywordsloader.h>
+#include <dbwrapper.h>
+#include <pathutils.h>
+#include <constants.h>
+
+
 
 void MainWindow::keywordSelected(const QString &currentKeyword){
-    Singleton *one = Singleton::getInstance();
-    DBWrapper dbWrapper = one->getDBWrapper();
+
 
     ImageListWidget* lrImages = ui->lrImages;
     lrImages->clear();
 
     QList<PhotoEntry> photos;
     if(currentKeyword=="[without tags]"){
-        photos = dbWrapper.getPhotosWithoutTags();
+        photos = dbWrapper->getPhotosWithoutTags();
     }else {
-        photos = dbWrapper.getPhotosByKeyword(currentKeyword);
+        photos = dbWrapper->getPhotosByKeyword(currentKeyword);
     }
 
     lrImages->setIconSize(QSize(250,250));
@@ -71,10 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     ui->setupUi(this);
     DndTableView* keywordsTable = ui->keywordsTable;
 
-    Singleton *one = Singleton::getInstance();
-    this->dbWrapper = &one->getDBWrapper();
     keywordsTable->setModel(dbWrapper->getTagsTableModel());
-    keywordsTable->setCurrentIndex( keywordsTable->model()->index(0,0));
+    keywordsTable->setCurrentIndex(keywordsTable->model()->index(0,0));
     connect(keywordsTable, SIGNAL(keywordChanged(QString)),
                           this, SLOT(keywordSelected(QString)));
 

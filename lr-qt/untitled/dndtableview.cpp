@@ -52,18 +52,18 @@ Keyword DndTableView::extractCurrentKeyword(QDropEvent *event){
     int row = modelIndex.row();
     QModelIndex firstModelIndex =  this->model()->index(row, 0);
     QString keywordValue = firstModelIndex.data().toString();
-    Keyword keyword = dbWrapper.getKeywordByValue(keywordValue);
+    Keyword keyword = dbWrapper->getKeywordByValue(keywordValue);
     return keyword;
 }
 
 void DndTableView::dropEvent(QDropEvent *event){
     event->acceptProposedAction();
     QString uuid = event->mimeData()->text();
-    PhotoEntry photoEntry = dbWrapper.getPhotoByUUID(uuid);
+    PhotoEntry photoEntry = dbWrapper->getPhotoByUUID(uuid);
     Keyword keyword = extractCurrentKeyword(event);
-    QList<Keyword> keywords =  dbWrapper.getKeywordsForPhoto(dbWrapper.getPhotoByUUID(uuid));
+    QList<Keyword> keywords =  dbWrapper->getKeywordsForPhoto(dbWrapper->getPhotoByUUID(uuid));
     if(!keywords.contains(keyword)){
-        dbWrapper.addKeyword(photoEntry, keyword);
+        dbWrapper->addKeyword(photoEntry, keyword);
         QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>
                                                (this->model());
         model->query().exec();

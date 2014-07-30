@@ -30,7 +30,7 @@ protected slots:
 
 private:
     Ui::MainWindow *ui;
-    DBWrapper *dbWrapper;
+    DBWrapper* dbWrapper = &DBWrapper::GetInstance();
     void MainWindow::showMessageBox(QString text);
 };
 

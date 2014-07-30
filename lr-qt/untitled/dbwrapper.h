@@ -12,7 +12,11 @@
 class DBWrapper
 {
 public:
-    DBWrapper();
+    static DBWrapper &GetInstance(){
+          static DBWrapper instance;
+          return instance;
+     }
+
     ~DBWrapper();
     void addPhotoEntry(PhotoEntry entry);
     Keyword getKeywordByValue(QString value);
@@ -27,6 +31,7 @@ public:
     QSqlQueryModel* getTagsTableModel();
     QList<Keyword> getKeywordsForPhoto(PhotoEntry entry);
 private:
+    DBWrapper();
     QSqlDatabase db;
 
 };

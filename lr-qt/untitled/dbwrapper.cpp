@@ -6,8 +6,8 @@
 #include <QList>
 
 
-
 DBWrapper::DBWrapper(){
+    qDebug()<<"created!!";
     db = (QSqlDatabase::addDatabase("QSQLITE"));
     QString path("C:/dev/projects/lr-plugin/lr-qt/data");
     path.append(QDir::separator()).append("plugin.origin.db");

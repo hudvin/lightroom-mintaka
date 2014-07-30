@@ -16,7 +16,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     keywordsloader.cpp \
     dbwrapper.cpp \
-    dbconnector.cpp \
     csvreader.cpp \
     pathutils.cpp \
     dndtableview.cpp \
@@ -25,7 +24,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     keywordsloader.h \
     dbwrapper.h \
-    dbconnector.h \
     csvreader.h \
     pathutils.h \
     structures.h \
