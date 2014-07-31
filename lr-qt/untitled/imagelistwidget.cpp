@@ -39,7 +39,7 @@ void ImageListWidget::showContextMenuForWidget(const QPoint &pos){
             if(contextMenu.exec(mapToGlobal(pos)) == &removeAction){
                 dbWrapper->removeKeywordFromPhoto(dbWrapper->getPhotoByUUID(uuid), dbWrapper->getKeywordByValue(currentKeyword));
                 qDebug()<<"remove action has been called";
-                emit itemWasRemoved();
+                emit pleaseReload();
             }
         }
     }

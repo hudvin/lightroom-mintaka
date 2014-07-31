@@ -27,8 +27,7 @@ private slots:
     void on_saveBtn_clicked();
 
 protected slots:
-    void keywordSelected(const QString &currentKeyword);
-    void dataIsDropped();
+    void reloadAll();
 
 
 private:

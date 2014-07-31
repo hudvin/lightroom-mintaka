@@ -14,16 +14,16 @@ DndTableView::DndTableView(QWidget *parent) : QTableView(parent){
 }
 
 void DndTableView::reloadData(){
-    QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>
-                                           (this->model());
+    QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>(this->model());
     model->query().exec();
     emit dataChanged(QModelIndex(), QModelIndex());
 }
 
 void DndTableView::activate(){
-    selectRow(0);
+    selectRow(1);
+
     setFocus();
-    updateCurrentKeyword(model()->index(0, 0).data().toString());
+    updateCurrentKeyword(model()->index(1, 0).data().toString());
     connect(this,SIGNAL(clicked(QModelIndex)),this,SLOT(clickedSlot(QModelIndex)));
 }
 
@@ -41,8 +41,7 @@ void DndTableView::clickedSlot(const QModelIndex index){
 void DndTableView::updateCurrentKeyword(QString keyword){
     if (currentKeyword!=keyword){
         currentKeyword = keyword;
-        //emit signal
-        emit keywordChanged(currentKeyword);
+        emit pleaseReload();
     }
 }
 
@@ -71,8 +70,15 @@ void DndTableView::dropEvent(QDropEvent *event){
     QList<Keyword> keywords =  dbWrapper->getKeywordsForPhoto(dbWrapper->getPhotoByUUID(uuid));
     if(!keywords.contains(keyword)){
         dbWrapper->addKeyword(photoEntry, keyword);
-        reloadData();
-        emit dataIsDropped();
+        //restore selected keyword
+        for (int i = 0; i < model()->rowCount(); ++i) {
+            if(model()->index(i,0).data().toString() == currentKeyword){
+                selectRow(i);
+                break;
+            }
+
+        }
+        emit pleaseReload();
     }
 }
 
@@ -81,5 +87,7 @@ void DndTableView::dragMoveEvent(QDragMoveEvent * event){
     if(keyword.id!=-1){
         event->acceptProposedAction();
         setCurrentIndex(this->indexAt(event->pos()));
+    }else {
+        event->ignore();
     }
 }

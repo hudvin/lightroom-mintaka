@@ -32,12 +32,13 @@
 #include <constants.h>
 
 
-void MainWindow::keywordSelected(const QString &currentKeyword){
+void MainWindow::reloadAll(){
+    QString currentKeyword = keywordsTable->getCurrentKeyword();
     lrImages->clear();
     lrImages->setCurrentKeyword(currentKeyword);
 
     QList<PhotoEntry> photos;
-    if(currentKeyword== Constants::Keywords::WITHOUT_KEYWORDS){
+    if(currentKeyword == Constants::Keywords::WITHOUT_KEYWORDS){
         photos = dbWrapper->getPhotosWithoutTags();
     } else if(currentKeyword == Constants::Keywords::ALL_PHOTOS){
         photos = dbWrapper->getAllPhotos();
@@ -54,36 +55,28 @@ void MainWindow::keywordSelected(const QString &currentKeyword){
 
     lrImages->setAcceptDrops(false);
     lrImages->setDragEnabled(true);
-
-    qDebug()<<currentKeyword;
+    keywordsTable->reloadData();
 }
+
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
     ui->setupUi(this);
+
     lrImages = ui->lrImages;
     keywordsTable = ui->keywordsTable;
 
     keywordsTable->setModel(dbWrapper->getTagsTableModel());
-    keywordsTable->setCurrentIndex(keywordsTable->model()->index(0,0));
-    connect(keywordsTable, SIGNAL(keywordChanged(QString)),
-                          this, SLOT(keywordSelected(QString)));
 
-    connect(keywordsTable, SIGNAL(dataIsDropped()),
-            this, SLOT(dataIsDropped()) );
+    keywordsTable->setCurrentIndex(keywordsTable->model()->index(1,0));
 
-
-    connect(lrImages, SIGNAL(itemWasRemoved()),
-            this, SLOT(dataIsDropped()) );
-
+    connect(keywordsTable, SIGNAL(pleaseReload()),this, SLOT(reloadAll()));
+    connect(keywordsTable, SIGNAL(pleaseReload()), this, SLOT(reloadAll()) );
+    connect(lrImages, SIGNAL(pleaseReload()),this, SLOT(reloadAll()) );
 
     keywordsTable->activate();
 }
 
 
-void MainWindow::dataIsDropped(){
-    keywordSelected(ui->keywordsTable->getCurrentKeyword());
-    keywordsTable->reloadData();
-}
 
 MainWindow::~MainWindow(){
     delete ui;
@@ -129,17 +122,6 @@ void MainWindow::on_saveBtn_clicked(){
     }
     showMessageBox("Saved");
 }
-
-//void MainWindow::on_keywordsTable_clicked(const QModelIndex &index){
-//    if (index.isValid()) {
-//        QTableView* keywordsTable = ui->keywordsTable;
-//        QModelIndexList list  = keywordsTable->selectionModel()->selectedRows();
-//        QVariant value =  list.at(0).data(0);
-//        if(value.isValid()){
-//          //  showMessageBox(value.toString());
-//        }
-//     }
-//}
 
 
 void MainWindow::showMessageBox(QString text){

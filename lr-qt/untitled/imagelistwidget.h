@@ -29,7 +29,7 @@ private:
    DBWrapper* dbWrapper = &DBWrapper::GetInstance();
 
 signals:
-  void itemWasRemoved();
+  void pleaseReload();
 
 public slots:
    void showContextMenuForWidget(const QPoint &pos);

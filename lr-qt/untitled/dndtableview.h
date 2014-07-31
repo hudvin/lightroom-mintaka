@@ -4,6 +4,7 @@
 #include <QTableView>
 #include <QDragMoveEvent>
 #include <dbwrapper.h>
+#include <QModelIndex>
 
 class DndTableView : public QTableView
 {
@@ -26,10 +27,10 @@ protected:
     DBWrapper* dbWrapper = &DBWrapper::GetInstance();
     QString currentKeyword;
 
+private:
 
 signals:
-    void keywordChanged(const QString &keyword);
-    void dataIsDropped();
+    void pleaseReload();
 
 private slots:
     void clickedSlot(QModelIndex index);
