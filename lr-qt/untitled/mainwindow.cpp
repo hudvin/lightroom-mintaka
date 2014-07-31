@@ -33,14 +33,14 @@
 
 
 void MainWindow::keywordSelected(const QString &currentKeyword){
-
-
     ImageListWidget* lrImages = ui->lrImages;
     lrImages->clear();
 
     QList<PhotoEntry> photos;
     if(currentKeyword=="[without tags]"){
         photos = dbWrapper->getPhotosWithoutTags();
+    } else if(currentKeyword == "[all photos]"){
+        photos = dbWrapper->getAllPhotos();
     }else {
         photos = dbWrapper->getPhotosByKeyword(currentKeyword);
     }
@@ -84,9 +84,8 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::on_generateKeywordsBtn_clicked(){
-    showMessageBox("Generate keywords");
     int numTasks = 100000;
-    QProgressDialog progress("Task in progress...", "Cancel", 0, numTasks, this);
+    QProgressDialog progress("Generating keywords", "Cancel", 0, numTasks, this);
     progress.setWindowModality(Qt::WindowModal);
 
     for (int i = 0; i < numTasks; i++) {

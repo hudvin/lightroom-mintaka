@@ -24,7 +24,7 @@ public:
     void addKeyword(PhotoEntry photo, Keyword keyword);
     QList<PhotoEntry> getPhotosWithoutTags();
     QList<PhotoEntry> getPhotosByKeyword(QString keywordValue="%");
-    QList<PhotoEntry> DBWrapper::getAllPhotos();
+    QList<PhotoEntry> getAllPhotos();
     QSqlDatabase getDatabase();
     void deleteAllData();
     void closeDatabase();

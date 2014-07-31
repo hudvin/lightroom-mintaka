@@ -158,13 +158,15 @@ QList<PhotoEntry> DBWrapper::getPhotosByKeyword(QString keywordValue){
 
 QSqlQueryModel* DBWrapper::getTagsTableModel(){
     QSqlQueryModel *model = new QSqlQueryModel;
-    model->setQuery("SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
-                    "WHERE photos_tags.tag_id=tags.id ) as num " \
-                    "FROM tags WHERE is_hidden=0 " \
-                    "UNION " \
+    model->setQuery("SELECT '[all photos]', (SELECT COUNT(*) FROM photos) "
+                    "UNION  ALL " \
                     " SELECT '[without tags]', " \
                     "(SELECT COUNT(*) FROM photos " \
-                    "WHERE photos.id NOT IN(SELECT photos_tags.photo_id FROM photos_tags)) as num "
+                    "WHERE photos.id NOT IN(SELECT photos_tags.photo_id FROM photos_tags)) as num " \
+                    "UNION ALL " \
+                    "SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
+                                        "WHERE photos_tags.tag_id=tags.id ) as num " \
+                                        "FROM tags WHERE is_hidden=0 " \
                     );
 
     model->setHeaderData(0,Qt::Horizontal, "keyword");
