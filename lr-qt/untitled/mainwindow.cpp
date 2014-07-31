@@ -29,28 +29,27 @@
 #include <dbwrapper.h>
 #include <pathutils.h>
 #include <constants.h>
-
+#include <constants.h>
 
 
 void MainWindow::keywordSelected(const QString &currentKeyword){
-    ImageListWidget* lrImages = ui->lrImages;
     lrImages->clear();
+    lrImages->setCurrentKeyword(currentKeyword);
 
     QList<PhotoEntry> photos;
-    if(currentKeyword=="[without tags]"){
+    if(currentKeyword== Constants::Keywords::WITHOUT_KEYWORDS){
         photos = dbWrapper->getPhotosWithoutTags();
-    } else if(currentKeyword == "[all photos]"){
+    } else if(currentKeyword == Constants::Keywords::ALL_PHOTOS){
         photos = dbWrapper->getAllPhotos();
     }else {
         photos = dbWrapper->getPhotosByKeyword(currentKeyword);
     }
 
-    lrImages->setIconSize(QSize(250,250));
+    lrImages->setIconSize(QSize(200,400));
     foreach (PhotoEntry phonoEntry, photos) {
         QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
         QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",lrImages);
         itm->setData(5, phonoEntry.uuid);
-
     }
 
     lrImages->setAcceptDrops(false);
@@ -61,7 +60,8 @@ void MainWindow::keywordSelected(const QString &currentKeyword){
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow){
     ui->setupUi(this);
-    DndTableView* keywordsTable = ui->keywordsTable;
+    lrImages = ui->lrImages;
+    keywordsTable = ui->keywordsTable;
 
     keywordsTable->setModel(dbWrapper->getTagsTableModel());
     keywordsTable->setCurrentIndex(keywordsTable->model()->index(0,0));
@@ -71,12 +71,18 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     connect(keywordsTable, SIGNAL(dataIsDropped()),
             this, SLOT(dataIsDropped()) );
 
+
+    connect(lrImages, SIGNAL(itemWasRemoved()),
+            this, SLOT(dataIsDropped()) );
+
+
     keywordsTable->activate();
 }
 
+
 void MainWindow::dataIsDropped(){
     keywordSelected(ui->keywordsTable->getCurrentKeyword());
-    qDebug()<<"changed";
+    keywordsTable->reloadData();
 }
 
 MainWindow::~MainWindow(){

@@ -13,6 +13,13 @@ DndTableView::DndTableView(QWidget *parent) : QTableView(parent){
     setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
+void DndTableView::reloadData(){
+    QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>
+                                           (this->model());
+    model->query().exec();
+    emit dataChanged(QModelIndex(), QModelIndex());
+}
+
 void DndTableView::activate(){
     selectRow(0);
     setFocus();
@@ -64,10 +71,7 @@ void DndTableView::dropEvent(QDropEvent *event){
     QList<Keyword> keywords =  dbWrapper->getKeywordsForPhoto(dbWrapper->getPhotoByUUID(uuid));
     if(!keywords.contains(keyword)){
         dbWrapper->addKeyword(photoEntry, keyword);
-        QSqlQueryModel* model = dynamic_cast <QSqlQueryModel*>
-                                               (this->model());
-        model->query().exec();
-        emit dataChanged(QModelIndex(), QModelIndex());
+        reloadData();
         emit dataIsDropped();
     }
 }

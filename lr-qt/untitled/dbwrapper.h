@@ -30,6 +30,7 @@ public:
     void closeDatabase();
     QSqlQueryModel* getTagsTableModel();
     QList<Keyword> getKeywordsForPhoto(PhotoEntry entry);
+    void removeKeywordFromPhoto(PhotoEntry photoEntry, Keyword keyword);
 private:
     DBWrapper();
     QSqlDatabase db;

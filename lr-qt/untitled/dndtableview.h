@@ -12,7 +12,7 @@ public:
     explicit DndTableView(QWidget *parent = 0);
     void activate();
     QString getCurrentKeyword();
-
+    void reloadData();
 protected:
 
     virtual void dragEnterEvent(QDragEnterEvent *event);
@@ -23,7 +23,6 @@ protected:
     Keyword extractCurrentKeyword(QDropEvent *event);
 
 
-    //Singleton *one = Singleton::getInstance();
     DBWrapper* dbWrapper = &DBWrapper::GetInstance();
     QString currentKeyword;
 

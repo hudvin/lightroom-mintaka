@@ -3,7 +3,10 @@
 
 #include <QMainWindow>
 #include <QItemSelection>
+
+#include <dndtableview.h>
 #include <dbwrapper.h>
+#include <imagelistwidget.h>
 
 namespace Ui {
 class MainWindow;
@@ -30,6 +33,8 @@ protected slots:
 
 private:
     Ui::MainWindow *ui;
+    ImageListWidget* lrImages;
+    DndTableView* keywordsTable;
     DBWrapper* dbWrapper = &DBWrapper::GetInstance();
     void MainWindow::showMessageBox(QString text);
 };

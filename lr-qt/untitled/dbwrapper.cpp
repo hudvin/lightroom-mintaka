@@ -5,6 +5,8 @@
 #include <QDir>
 #include <QList>
 
+#include <constants.h>
+
 
 DBWrapper::DBWrapper(){
     qDebug()<<"created!!";
@@ -22,19 +24,27 @@ DBWrapper::DBWrapper(){
 
 DBWrapper::~DBWrapper(){
   qDebug()<<"call destructor of DBWrapper";
+  closeDatabase();
 }
 
 void DBWrapper::closeDatabase(){
     qDebug()<<"before close database";
     qDebug()<<db.isOpen();
     if(db.isOpen()){
-      //  db.close();
+        db.close();
     }
     qDebug()<<"close database";
 }
 
 QSqlDatabase DBWrapper::getDatabase(){
     return db;
+}
+
+void DBWrapper::removeKeywordFromPhoto(PhotoEntry photoEntry, Keyword keyword){
+    QSqlQuery query("DELETE FROM photos_tags WHERE tag_id=? AND photo_id=?");
+    query.bindValue(0, keyword.id);
+    query.bindValue(1, photoEntry.id);
+    query.exec();
 }
 
 
@@ -158,16 +168,19 @@ QList<PhotoEntry> DBWrapper::getPhotosByKeyword(QString keywordValue){
 
 QSqlQueryModel* DBWrapper::getTagsTableModel(){
     QSqlQueryModel *model = new QSqlQueryModel;
-    model->setQuery("SELECT '[all photos]', (SELECT COUNT(*) FROM photos) "
-                    "UNION  ALL " \
-                    " SELECT '[without tags]', " \
-                    "(SELECT COUNT(*) FROM photos " \
-                    "WHERE photos.id NOT IN(SELECT photos_tags.photo_id FROM photos_tags)) as num " \
-                    "UNION ALL " \
-                    "SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
-                                        "WHERE photos_tags.tag_id=tags.id ) as num " \
-                                        "FROM tags WHERE is_hidden=0 " \
-                    );
+    QSqlQuery query;
+    query.exec(QString("SELECT '%1', (SELECT COUNT(*) FROM photos) "
+                          "UNION  ALL " \
+                          " SELECT '%2', " \
+                          "(SELECT COUNT(*) FROM photos " \
+                          "WHERE photos.id NOT IN(SELECT photos_tags.photo_id FROM photos_tags)) as num " \
+                          "UNION ALL " \
+                          "SELECT tag, (SELECT COUNT(*) FROM photos_tags "\
+                                              "WHERE photos_tags.tag_id=tags.id ) as num FROM tags WHERE is_hidden=0 ")
+               .arg(Constants::Keywords::ALL_PHOTOS)
+               .arg(Constants::Keywords::WITHOUT_KEYWORDS));
+
+    model->setQuery(query);
 
     model->setHeaderData(0,Qt::Horizontal, "keyword");
     model->setHeaderData(1,Qt::Horizontal, "number of \n photos");
