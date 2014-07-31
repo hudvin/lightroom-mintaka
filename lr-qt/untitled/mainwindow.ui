@@ -110,6 +110,9 @@
       </item>
       <item>
        <widget class="ImageListWidget" name="lrImages">
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
         <property name="showDropIndicator" stdset="0">
          <bool>false</bool>
         </property>

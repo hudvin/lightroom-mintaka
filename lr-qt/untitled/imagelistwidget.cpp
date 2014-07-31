@@ -33,12 +33,20 @@ void ImageListWidget::showContextMenuForWidget(const QPoint &pos){
         QModelIndex modelIndex = this->indexAt(pos);
         if(modelIndex.isValid()){
             QString uuid = modelIndex.data(5).toString();
-            qDebug()<< uuid;
             QAction removeAction("Remove", this);
+            QAction removeAllAction("Remove all",this);
             contextMenu.addAction(&removeAction);
-            if(contextMenu.exec(mapToGlobal(pos)) == &removeAction){
+            contextMenu.addAction(&removeAllAction);
+            QAction* exec = contextMenu.exec(mapToGlobal(pos));
+            if(exec == &removeAction){
                 dbWrapper->removeKeywordFromPhoto(dbWrapper->getPhotoByUUID(uuid), dbWrapper->getKeywordByValue(currentKeyword));
-                qDebug()<<"remove action has been called";
+                emit pleaseReload();
+            }else if(exec == &removeAllAction){
+                PhotoEntry photoEntry = dbWrapper->getPhotoByUUID(uuid);
+                QList<Keyword> keywords = dbWrapper->getKeywordsForPhoto(photoEntry);
+                foreach (Keyword keyword, keywords) {
+                   dbWrapper->removeKeywordFromPhoto(photoEntry, keyword);
+                }
                 emit pleaseReload();
             }
         }
