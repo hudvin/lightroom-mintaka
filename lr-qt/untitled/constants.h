@@ -15,6 +15,12 @@ namespace Constants{
 
    }
 
+   namespace MagicNumbers{
+
+       const int DATA_KEY = 5;
+
+   }
+
 }
 
 

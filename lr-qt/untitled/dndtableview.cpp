@@ -21,7 +21,6 @@ void DndTableView::reloadData(){
 
 void DndTableView::activate(){
     selectRow(1);
-
     setFocus();
     updateCurrentKeyword(model()->index(1, 0).data().toString());
     connect(this,SIGNAL(clicked(QModelIndex)),this,SLOT(clickedSlot(QModelIndex)));

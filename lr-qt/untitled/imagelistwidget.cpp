@@ -32,7 +32,7 @@ void ImageListWidget::showContextMenuForWidget(const QPoint &pos){
         QMenu contextMenu("Context menu", this);
         QModelIndex modelIndex = this->indexAt(pos);
         if(modelIndex.isValid()){
-            QString uuid = modelIndex.data(5).toString();
+            QString uuid = modelIndex.data(Constants::MagicNumbers::DATA_KEY).toString();
             QAction removeAction("Remove", this);
             QAction removeAllAction("Remove all",this);
             contextMenu.addAction(&removeAction);
@@ -68,12 +68,9 @@ void ImageListWidget::mouseMoveEvent(QMouseEvent *event){
 
            QDrag *drag = new QDrag(this);
            QMimeData *mimeData = new QMimeData;
-           QString uuid = indexAt(event->pos()).data(5).toString();//FIXME Magic Number
+           QString uuid = indexAt(event->pos()).data(Constants::MagicNumbers::DATA_KEY).toString();
            mimeData->setText(uuid);
            drag->setMimeData(mimeData);
-           //get info about current selection - pass instead of Some text
-           Qt::DropAction dropAction = drag->start(Qt::CopyAction | Qt::MoveAction);
-
-
+           drag->start(Qt::CopyAction | Qt::MoveAction);
 }
 

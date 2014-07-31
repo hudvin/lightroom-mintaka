@@ -29,8 +29,6 @@
 #include <dbwrapper.h>
 #include <pathutils.h>
 #include <constants.h>
-#include <constants.h>
-
 
 void MainWindow::reloadAll(){
     QString currentKeyword = keywordsTable->getCurrentKeyword();
@@ -50,7 +48,7 @@ void MainWindow::reloadAll(){
     foreach (PhotoEntry phonoEntry, photos) {
         QString fullPath = PathUtils::getAppTmpDir() + "/"+phonoEntry.filename;
         QListWidgetItem *itm = new QListWidgetItem(QIcon(fullPath),"",lrImages);
-        itm->setData(5, phonoEntry.uuid);
+        itm->setData(Constants::MagicNumbers::DATA_KEY, phonoEntry.uuid);
     }
 
     lrImages->setAcceptDrops(false);
