@@ -9,8 +9,7 @@
 #include "constants.h"
 
 
-ImageListWidget::ImageListWidget(QWidget *parent) :
-    QListWidget(parent){
+ImageListWidget::ImageListWidget(QWidget *parent) : QListWidget(parent){
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
              SLOT(showContextMenuForWidget(const QPoint &)));

@@ -7,6 +7,7 @@
 #include <dndtableview.h>
 #include <dbwrapper.h>
 #include <imagelistwidget.h>
+#include <keywordsextractorstrategy.h>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ private slots:
 
     void on_generateKeywordsBtn_clicked();
     void on_saveBtn_clicked();
+
 
 protected slots:
     void reloadAll();

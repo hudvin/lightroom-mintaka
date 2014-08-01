@@ -23,12 +23,17 @@
 #include <QDropEvent>
 #include <QFile>
 #include <QTextStream>
+#include <QSharedPointer>
+#include <QThread>
+#include <QTimer>
 
 #include <csvreader.h>
 #include <keywordsloader.h>
 #include <dbwrapper.h>
 #include <pathutils.h>
 #include <constants.h>
+#include <keywordsextractor.h>
+#include <keywordsextractorstrategy.h>
 
 void MainWindow::reloadAll(){
     QString currentKeyword = keywordsTable->getCurrentKeyword();
@@ -75,23 +80,33 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 }
 
 
-
 MainWindow::~MainWindow(){
     delete ui;
 }
 
 void MainWindow::on_generateKeywordsBtn_clicked(){
-    int numTasks = 100000;
-    QProgressDialog progress("Generating keywords", "Cancel", 0, numTasks, this);
-    progress.setWindowModality(Qt::WindowModal);
+    QList<PhotoEntry> photos = dbWrapper->getAllPhotos();
 
-    for (int i = 0; i < numTasks; i++) {
-        progress.setValue(i);
-        if (progress.wasCanceled()){
-          break;
-        }
-    }
-    progress.setValue(numTasks);
+    KeywordsExtractor* ke =
+            new KeywordsExtractor(QSharedPointer<RandomKeywordsExtractorStrategy>(new RandomKeywordsExtractorStrategy),this);
+    ke->addPhotoEntries(photos);
+
+    int numTasks = photos.size();
+    QProgressDialog* dialog = new QProgressDialog("Generating keywords", "Cancel", 0, numTasks, this);
+    dialog->setWindowModality(Qt::WindowModal);
+    disconnect(dialog, SIGNAL(canceled()), dialog, SLOT(cancel()));
+    dialog->setValue(ke->getProcessedCount());
+    connect(dialog, &QProgressDialog::canceled, [=]() {
+        ke->stop();
+     });
+    connect(ke, SIGNAL(valueChanged(int)), dialog, SLOT(setValue(int)));
+    connect(ke, &KeywordsExtractor::finished, [=](){
+        dialog->cancel();
+        qDebug() <<"close dialog";
+        showMessageBox("finished");
+    });
+    ke->startExtraction();
+    dialog->show();
 }
 
 void MainWindow::on_saveBtn_clicked(){

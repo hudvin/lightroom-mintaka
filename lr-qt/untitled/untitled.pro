@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     csvreader.cpp \
     pathutils.cpp \
     dndtableview.cpp \
-    imagelistwidget.cpp
+    imagelistwidget.cpp \
+    keywordsextractor.cpp
 
 HEADERS  += mainwindow.h \
     keywordsloader.h \
@@ -29,7 +30,9 @@ HEADERS  += mainwindow.h \
     structures.h \
     dndtableview.h \
     imagelistwidget.h \
-    constants.h
+    constants.h \
+    keywordsextractorstrategy.h \
+    keywordsextractor.h
 
 FORMS    += mainwindow.ui
 
