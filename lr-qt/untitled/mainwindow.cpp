@@ -86,9 +86,12 @@ MainWindow::~MainWindow(){
 
 void MainWindow::on_generateKeywordsBtn_clicked(){
     QList<PhotoEntry> photos = dbWrapper->getAllPhotos();
+    QList<Keyword> allKeywords = dbWrapper->getAllKeywords();
 
     KeywordsExtractor* ke =
-            new KeywordsExtractor(QSharedPointer<RandomKeywordsExtractorStrategy>(new RandomKeywordsExtractorStrategy),this);
+            new KeywordsExtractor
+            (QSharedPointer<RandomKeywordsExtractorStrategy>(new RandomKeywordsExtractorStrategy(allKeywords)),
+             this);
     ke->addPhotoEntries(photos);
 
     int numTasks = photos.size();
@@ -104,6 +107,17 @@ void MainWindow::on_generateKeywordsBtn_clicked(){
         dialog->cancel();
         qDebug() <<"close dialog";
         showMessageBox("finished");
+        QList<ResultItem> results = ke->getResults();
+        foreach (ResultItem resultItem, results) {
+            PhotoEntry photoItem = resultItem.first;
+            qDebug()<<photoItem.uuid;
+            foreach (Keyword keywordItem, resultItem.second) {
+                qDebug()<<keywordItem.keyword;
+                dbWrapper->addKeyword(photoItem, keywordItem);
+            }
+        }
+        reloadAll();
+
     });
     ke->startExtraction();
     dialog->show();
@@ -127,7 +141,7 @@ void MainWindow::on_saveBtn_clicked(){
     QString filePath =appTmpDir + "/" + Constants::OUTPUT_FILE;
 
     QFile file(filePath);
-    if (file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::ReadWrite|QFile::Truncate)) {
         QTextStream stream(&file);
         foreach (const QString &str, csvData){
             stream << str << endl;

@@ -127,6 +127,18 @@ QList<PhotoEntry> DBWrapper::getAllPhotos(){
     return data;
 }
 
+QList<Keyword> DBWrapper::getAllKeywords(){
+    QList<Keyword> data;
+    QSqlQuery query("SELECT tags.id, tags.tag from tags ");
+    query.exec();
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString tag = query.value(1).toString();
+        Keyword keyword(id, tag);
+        data<<keyword;
+     }
+    return data;
+}
 
 QList<Keyword> DBWrapper::getKeywordsForPhoto(PhotoEntry entry){
     QList<Keyword> data;

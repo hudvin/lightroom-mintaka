@@ -11,6 +11,11 @@ void KeywordsExtractor::addPhotoEntries(QList<PhotoEntry> photos){
     this->photos = photos;
 }
 
+QList<QPair<PhotoEntry, QList<Keyword>>> KeywordsExtractor::getResults(){
+    return result;
+}
+
+
 int KeywordsExtractor::getTotalCount(){
     return this->photos.size();
 }
@@ -48,7 +53,7 @@ void KeywordsExtractor::process(){
                extractorStrategy.data()->extract(photoEntry);
        result.append(QPair<PhotoEntry, QList<Keyword>>(photoEntry, keywords));
        qDebug()<<"processed "<<getProcessedCount();
-       QThread::currentThread()->msleep(1000);
+       QThread::currentThread()->msleep(200);
        emit valueChanged(getProcessedCount());
     }
     emit finished();

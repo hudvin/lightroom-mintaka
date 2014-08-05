@@ -1,7 +1,10 @@
-#include <QString>
-
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
+
+#include <QString>
+#include <QPair>
+#include <QList>
+
 
 
 struct PhotoEntry{
@@ -29,6 +32,9 @@ struct Keyword{
         return false;
     }
 };
+
+
+typedef QPair<PhotoEntry, QList<Keyword>> ResultItem;
 
 
 #endif // STRUCTURES_H

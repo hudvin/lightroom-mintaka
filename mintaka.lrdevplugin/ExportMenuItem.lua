@@ -121,15 +121,27 @@ local function performImport()
           local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
           local lines = io.open(listPath,"r") 
           for line in lines:lines() do
+            LrDialogs.message("1")
+            
             local cols = split(line,",")
             filename = cols[1]
             uuid = cols [2]
+            LrDialogs.message("2")
+           
             local photo = catalog:findPhotoByUuid(uuid)
+            LrDialogs.message(filename)
             if not(photo == nil) then
               for i = 3, #cols do
                 keywordTxt = cols[i]
+                LrDialogs.message("3")
+           
                 keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
+                LrDialogs.message("4 " .. keywordTxt)
+           
                 photo:addKeyword(keyword)
+                
+                LrDialogs.message("5")
+           
               end
             end 
           end 
@@ -139,6 +151,6 @@ local function performImport()
 end
 
 
---performImport()
-performExport()
+performImport()
+--performExport()
 

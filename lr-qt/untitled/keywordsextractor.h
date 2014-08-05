@@ -22,6 +22,7 @@ public:
     int getProcessedCount();
     bool isFinished();
     void startExtraction();
+    QList<QPair<PhotoEntry, QList<Keyword>>> getResults();
 
 
 private:
