@@ -9,10 +9,13 @@ local isDev = true
 if isDev ==false then
     LrDialogs.message('not dev')
     pathToExe = "mintaka.exe"
+    pathToData = LrPathUtils.getStandardFilePath('home') .. '/AppData/Local/mintaka/'
 else 
     pathToExe = "C:/dev/projects/lr-plugin/build/release/mintaka.exe"
-    LrDialogs.message('dev')
+    pathToData = LrPathUtils.getStandardFilePath('home')  .. '/AppData/Local/mintaka/'
+
 end
+  
 
 local function getSelection ()
 	 local catalog = lrApplication.activeCatalog()
@@ -22,13 +25,6 @@ local function getSelection ()
 	      return {}
           end
      end
-
-local function getAppTmpPath()
-  local appTmp = 'mintaka'
-  local globalTmpPath = LrPathUtils.getStandardFilePath('temp')
-  appTmpPath =  LrPathUtils.child(globalTmpPath, appTmp)
-  return appTmpPath
-end  
 
 local function split(s, delimiter)
     result = {};
@@ -45,7 +41,7 @@ end
 
 
 local function prepareTmpFolder()
-  appTmpPath =  getAppTmpPath()
+  appTmpPath =  pathToData
   local exists = LrFileUtils.exists(appTmpPath)
   if exists then
      for filePath in LrFileUtils.directoryEntries(appTmpPath) do
@@ -61,22 +57,28 @@ local function performImport()
   local catalog = lrApplication.activeCatalog()
   LrTasks.startAsyncTask( function()
       catalog:withWriteAccessDo('import keywords', function()
-          local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
+          local listPath = LrPathUtils.child(pathToData, "output.csv")
+          LrDialogs.message(listPath)
           local lines = io.open(listPath,"r") 
-          for line in lines:lines() do
-            local cols = split(line,",")
-            filename = cols[1]
-            uuid = cols [2]
-            local photo = catalog:findPhotoByUuid(uuid)
-            if not(photo == nil) then
-              for i = 3, #cols do
-                keywordTxt = cols[i]
-                keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
-                photo:addKeyword(keyword)
-              end
-            end 
-          end 
-          lines:close()  
+          if lines~=nil then
+            
+              for line in lines:lines() do
+                local cols = split(line,",")
+                filename = cols[1]
+                LrDialogs.message(line)
+                uuid = cols [2]
+                local photo = catalog:findPhotoByUuid(uuid)
+                if not(photo == nil) then
+                  for i = 3, #cols do
+                    keywordTxt = cols[i]
+                    keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
+                    photo:addKeyword(keyword)
+                  end
+                end 
+              end 
+             lines:close()  
+           end   
+          
       end)
    end )
 end
@@ -103,7 +105,7 @@ local function performExport()
                         LR_size_resolutionUnits = "inch",
                         LR_outputSharpeningOn = false,
                         LR_export_destinationType = "specificFolder",
-                        LR_export_destinationPathPrefix = getAppTmpPath(),
+                        LR_export_destinationPathPrefix = pathToData,
                         LR_collisionHandling = "skip",
 						LR_extensionCase = "lowercase",
 						LR_jpeg_useLimitSize = false,  
@@ -131,7 +133,7 @@ local function performExport()
         csv_items[uuid] = filename
       end
 	    
-      local listPath = LrPathUtils.child(getAppTmpPath(), "list.txt")
+      local listPath = LrPathUtils.child(pathToData, "list.txt")
       local f = io.open(listPath , "w" )
       
       for k, v in pairs(csv_items) do

@@ -6,13 +6,26 @@
 #include <QFileInfo>
 #include <QtDebug>
 #include <QStringList>
-#include <csvreader.h>
 #include <QApplication>
+#include <QDir>
+
+#include <csvreader.h>
+#include <pathutils.h>
 
 QTextStream cout(stdout, QIODevice::WriteOnly);
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
+    //create app dir
+    QDir appDir(PathUtils::getAppTmpDir());
+    if(!appDir.exists()){
+        appDir.mkpath(PathUtils::getAppTmpDir());
+    }
+    //remove previous output file
+    QFile outputFile(PathUtils::getAppTmpDir() + "/" + Constants::OUTPUT_FILE);
+    if(outputFile.exists()){
+        outputFile.remove();
+    }
     //remove all data from db
     DBWrapper *dbWrapper = &DBWrapper::GetInstance();
     dbWrapper->deleteAllData();

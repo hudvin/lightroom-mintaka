@@ -1,0 +1,7 @@
+/build/debug
+/build/release
+/lr_catalog/mintaka
+/build/Makefile
+/build/Makefile.Debug
+/build/Makefile.Release
+/build/ui_mainwindow.h
