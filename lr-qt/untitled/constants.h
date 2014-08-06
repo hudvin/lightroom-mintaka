@@ -8,6 +8,11 @@ namespace Constants{
 
    const QString OUTPUT_FILE = "output.csv";
 
+   namespace Database {
+
+       const QString FILE_NAME = "database.db";
+
+   }
 
    namespace Keywords {
 

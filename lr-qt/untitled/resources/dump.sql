@@ -1,0 +1,11 @@
+CREATE TABLE tags (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, tag TEXT NOT NULL UNIQUE, is_hidden INTEGER NOT NULL);
+INSERT INTO `tags` VALUES(1,'people',0);
+INSERT INTO `tags` VALUES(2,'mountain',0);
+INSERT INTO `tags` VALUES(3,'valley',0);
+INSERT INTO `tags` VALUES(4,'landscape',0);
+INSERT INTO `tags` VALUES(5,'building',0);
+CREATE TABLE photos_tags (photo_id INTEGER NOT NULL, tag_id INTEGER NOT NULL, FOREIGN KEY(photo_id) REFERENCES photos(id), FOREIGN KEY(tag_id) REFERENCES tags(id));
+CREATE TABLE photos (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, uuid TEXT NOT NULL, filename TEXT NOT NULL);
+INSERT INTO `photos` VALUES(16891,'CD51A3DE-FD3F-4D7E-828E-72D71E2CCC32','9LrGiXkWZCY.jpg');
+;
+CREATE UNIQUE INDEX photos_tags_unique ON photos_tags(tag_id, photo_id);

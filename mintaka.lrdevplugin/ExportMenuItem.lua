@@ -5,6 +5,15 @@ local LrExportSession = import 'LrExportSession'
 local LrPathUtils = import 'LrPathUtils'
 local LrFileUtils = import 'LrFileUtils'
 
+local isDev = true
+if isDev ==false then
+    LrDialogs.message('not dev')
+    pathToExe = "mintaka.exe"
+else 
+    pathToExe = "C:/dev/projects/lr-plugin/build/release/mintaka.exe"
+    LrDialogs.message('dev')
+end
+
 local function getSelection ()
 	 local catalog = lrApplication.activeCatalog()
 	 if catalog:getTargetPhoto () then
@@ -46,6 +55,30 @@ local function prepareTmpFolder()
      end 
   end  
   LrFileUtils.createDirectory(appTmpPath) 
+end
+
+local function performImport()
+  local catalog = lrApplication.activeCatalog()
+  LrTasks.startAsyncTask( function()
+      catalog:withWriteAccessDo('import keywords', function()
+          local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
+          local lines = io.open(listPath,"r") 
+          for line in lines:lines() do
+            local cols = split(line,",")
+            filename = cols[1]
+            uuid = cols [2]
+            local photo = catalog:findPhotoByUuid(uuid)
+            if not(photo == nil) then
+              for i = 3, #cols do
+                keywordTxt = cols[i]
+                keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
+                photo:addKeyword(keyword)
+              end
+            end 
+          end 
+          lines:close()  
+      end)
+   end )
 end
 
 local function performExport() 
@@ -107,6 +140,9 @@ local function performExport()
       end
       io.close(f)
 	   
+      exitStatus = LrTasks.execute(pathToExe)
+      --LrDialogs.message(exitStatus)
+      performImport()
 	end
 	)
 end
@@ -114,43 +150,8 @@ end
 
 
 
-local function performImport()
-  local catalog = lrApplication.activeCatalog()
-  LrTasks.startAsyncTask( function()
-      catalog:withWriteAccessDo('import keywords', function()
-          local listPath = LrPathUtils.child(getAppTmpPath(), "output.csv")
-          local lines = io.open(listPath,"r") 
-          for line in lines:lines() do
-            LrDialogs.message("1")
-            
-            local cols = split(line,",")
-            filename = cols[1]
-            uuid = cols [2]
-            LrDialogs.message("2")
-           
-            local photo = catalog:findPhotoByUuid(uuid)
-            LrDialogs.message(filename)
-            if not(photo == nil) then
-              for i = 3, #cols do
-                keywordTxt = cols[i]
-                LrDialogs.message("3")
-           
-                keyword =  catalog:createKeyword(keywordTxt, {}, false, nil, true)
-                LrDialogs.message("4 " .. keywordTxt)
-           
-                photo:addKeyword(keyword)
-                
-                LrDialogs.message("5")
-           
-              end
-            end 
-          end 
-          lines:close()  
-      end)
-   end )
-end
 
 
-performImport()
---performExport()
+--performImport()
+performExport()
 

@@ -4,22 +4,42 @@
 #include <QString>
 #include <QDir>
 #include <QList>
+#include <QFile>
 
+#include <pathutils.h>
 #include <constants.h>
 
 
-DBWrapper::DBWrapper(){
-    qDebug()<<"created!!";
+DBWrapper::DBWrapper(){ 
+    QString path = PathUtils::getAppTmpDir()+"/"+Constants::Database::FILE_NAME;
+    bool dbExists = QFile(path).exists();
+    //init db
     db = (QSqlDatabase::addDatabase("QSQLITE"));
-    QString path("C:/dev/projects/lr-plugin/lr-qt/data");
-    path.append(QDir::separator()).append("plugin.origin.db");
-    path = QDir::toNativeSeparators(path);
-    db.setDatabaseName(path);
+    db.setDatabaseName(QDir::toNativeSeparators(path));
     db.open();
+    //enable foreing keys constraints
     QSqlQuery query("PRAGMA foreign_keys = ON;",db);
     query.exec();
-    qDebug()<<path<<db.lastError();
-
+    //create db if needed
+    if(!dbExists){
+        QFile file(":/resources/dump.sql");
+        QStringList sqlCommands;
+        if (file.open(QIODevice::ReadOnly)){
+               QTextStream in(&file);
+               while ( !in.atEnd() ){
+                   sqlCommands += in.readLine();
+               }
+               file.close();
+        }
+        QSqlDatabase::database().transaction();
+        foreach (QString sqlCommand, sqlCommands) {
+            qDebug()<<sqlCommand;
+            QSqlQuery query;
+            query.exec(sqlCommand);
+        }
+        QSqlDatabase::database().commit();
+        qDebug()<<path<<db.lastError();
+    }
 }
 
 DBWrapper::~DBWrapper(){

@@ -38,3 +38,6 @@ FORMS    += mainwindow.ui
 
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
+
+RESOURCES += \
+    resources.qrc
